@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SchoolMarket Users</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+    header {
+      padding: 20px 24px;
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    h1 { margin: 0; font-size: 22px; }
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    section {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 16px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 6px;
+      font-size: 13px;
+      color: #4b5563;
+    }
+    input {
+      width: 100%;
+      height: 36px;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 12px;
+      height: 36px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 6px;
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button.secondary { background: #374151; }
+    pre {
+      grid-column: 1 / -1;
+      min-height: 180px;
+      margin: 0;
+      padding: 16px;
+      overflow: auto;
+      background: #111827;
+      color: #d1fae5;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>用户服务测试页</h1>
+  </header>
+
+  <main>
+    <section>
+      <h2>创建用户</h2>
+      <label for="create-name">用户名</label>
+      <input id="create-name" placeholder="name">
+      <label for="create-psw">密码</label>
+      <input id="create-psw" placeholder="psw" type="password">
+      <button onclick="createUser()">创建</button>
+    </section>
+
+    <section>
+      <h2>查询用户</h2>
+      <label for="find-id">用户 ID</label>
+      <input id="find-id" placeholder="1" type="number">
+      <button onclick="getUserById()">按 ID 查询</button>
+      <button class="secondary" onclick="getAllUsers()">查询全部</button>
+    </section>
+
+    <section>
+      <h2>更新用户</h2>
+      <label for="update-id">用户 ID</label>
+      <input id="update-id" placeholder="1" type="number">
+      <label for="update-name">新用户名</label>
+      <input id="update-name" placeholder="不填则不更新">
+      <label for="update-psw">新密码</label>
+      <input id="update-psw" placeholder="不填则不更新" type="password">
+      <button onclick="updateUser()">更新</button>
+    </section>
+
+    <section>
+      <h2>删除用户</h2>
+      <label for="delete-id">用户 ID</label>
+      <input id="delete-id" placeholder="1" type="number">
+      <button onclick="deleteUser()">删除</button>
+    </section>
+
+    <pre id="output">接口返回会显示在这里</pre>
+  </main>
+
+  <script>
+    const output = document.getElementById("output");
+
+    function value(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function numberValue(id) {
+      const raw = value(id);
+      return raw === "" ? 0 : Number(raw);
+    }
+
+    function show(data) {
+      output.textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function request(path, options = {}) {
+      try {
+        const res = await fetch(path, {
+          headers: { "Content-Type": "application/json" },
+          ...options,
+        });
+        const data = await res.json();
+        show({ httpStatus: res.status, body: data });
+      } catch (err) {
+        show({ error: err.message });
+      }
+    }
+
+    function createUser() {
+      request("/users/create", {
+        method: "POST",
+        body: JSON.stringify({
+          name: value("create-name"),
+          psw: value("create-psw"),
+        }),
+      });
+    }
+
+    function getUserById() {
+      request(`/users/find/aim?id=${encodeURIComponent(numberValue("find-id"))}`);
+    }
+
+    function getAllUsers() {
+      request("/users/find/all");
+    }
+
+    function updateUser() {
+      const body = { id: numberValue("update-id") };
+      const newName = value("update-name");
+      const newPsw = value("update-psw");
+      if (newName !== "") body.newname = newName;
+      if (newPsw !== "") body.newpsw = newPsw;
+
+      request("/users/update", {
+        method: "PUT",
+        body: JSON.stringify(body),
+      });
+    }
+
+    function deleteUser() {
+      request("/users/delete", {
+        method: "DELETE",
+        body: JSON.stringify({ id: numberValue("delete-id") }),
+      });
+    }
+  </script>
+</body>
+</html>

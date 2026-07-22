@@ -10,6 +10,7 @@ func RegisterRouter(r *gin.Engine, h *userhandler.UserHandler) {
 	users := r.Group("/users")
 
 	users.POST("/create", h.CreateUser)
+	users.POST("/login", h.Login)
 	users.GET("/find/aim", h.GetUserById)
 	users.GET("/find/all", h.GetAllUser)
 	users.PUT("/update", h.UpdateUser)

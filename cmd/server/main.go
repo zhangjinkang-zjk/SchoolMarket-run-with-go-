@@ -21,6 +21,7 @@ func main() {
 
 	r := gin.Default()
 
+	r.StaticFile("/", "./web/index.html")
 	userrouter.RegisterRouter(r, userHandler)
 
 	r.Run(":" + cfg.PORT)

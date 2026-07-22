@@ -1,6 +1,8 @@
 package userhandler
 
 import (
+	"strconv"
+
 	userservice "SchoolMarket-run-with-go-/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +19,11 @@ func NewUserHandler(serv userservice.UserService) *UserHandler {
 type CreateUserRequest struct {
 	Name string `json:"name"`
 	Psw  string `json:"psw"`
+}
+
+type LoginUserRequest struct {
+	Name string `json:"name"`
+	Password string `json:"psw"`
 }
 
 type DeleteUserRequest struct {
@@ -58,6 +65,37 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 		"data": gin.H{
 			"id":         user.ID,
 			"name":       user.Name,
+			"created_at": user.CreatedAt,
+			"updated_at": user.UpdatedAt,
+		},
+	})
+}
+
+func (h *UserHandler) Login(c *gin.Context) {
+	var req LoginUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{
+			"code": 400,
+			"msg": err.Error(), 
+		})
+		return
+	}
+	user, token, err := h.serv.Login(userservice.LoginUserRequest{
+		Name: req.Name,
+		Password: req.Password,
+	})
+	if err != nil {
+		c.JSON(404, gin.H{
+			"code": 404,
+			"msg": err.Error(),
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"code": 200,
+		"data": gin.H{
+			"token": token,
+			"name": user.Name,
 			"created_at": user.CreatedAt,
 			"updated_at": user.UpdatedAt,
 		},
@@ -125,12 +163,24 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 func (h *UserHandler) GetUserById(c *gin.Context) {
 	var req GetAimUserRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{
-			"code": 400,
-			"msg":  err.Error(),
-		})
-		return
+	if id := c.Query("id"); id != "" {
+		parsedID, err := strconv.ParseUint(id, 10, 64)
+		if err != nil {
+			c.JSON(400, gin.H{
+				"code": 400,
+				"msg":  "invalid user id",
+			})
+			return
+		}
+		req.Id = uint(parsedID)
+	} else {
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(400, gin.H{
+				"code": 400,
+				"msg":  err.Error(),
+			})
+			return
+		}
 	}
 	user, err := h.serv.GetUserById(userservice.GetAimUserRequest{
 		Id: req.Id,

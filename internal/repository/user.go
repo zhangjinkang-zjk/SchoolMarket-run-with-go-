@@ -13,6 +13,18 @@ func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
+func (r *UserRepository) LoginUser(name, pas string) (*model.User, error) {
+	var user model.User
+	result := r.db.Where("name = ?", name).First(&user)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &user, nil
+}
+
 func (r *UserRepository) CreateUser(user *model.User) error {
 	return r.db.Create(user).Error
 }
@@ -20,6 +32,18 @@ func (r *UserRepository) CreateUser(user *model.User) error {
 func (r *UserRepository) DeleteUser(Id uint) (int64, error) {
 	result := r.db.Delete(&model.User{}, Id)
 	return result.RowsAffected, result.Error
+}
+
+func (r *UserRepository) FindByName(name string) (*model.User, error) {
+	var user model.User
+	result := r.db.First(&user, name)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+	return &user, nil
 }
 
 func (r *UserRepository) FindAim(Id uint) (*model.User, error) {
