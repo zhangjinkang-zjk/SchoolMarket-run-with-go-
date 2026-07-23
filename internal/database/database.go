@@ -18,7 +18,7 @@ func InitDB(cfg *config.Config) *gorm.DB {
 		panic(fmt.Sprintf("数据库连接失败:%v\n", err))
 	}
 
-	if err := db.AutoMigrate(&model.User{}); err != nil {
+	if err := db.AutoMigrate(&model.User{}, &model.Goods{}, &model.Cart{}); err != nil {
 		panic(fmt.Sprintf("自动迁移失败:%v\n", err))
 	}
 

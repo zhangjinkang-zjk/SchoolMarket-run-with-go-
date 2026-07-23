@@ -36,7 +36,7 @@ func (r *UserRepository) DeleteUser(Id uint) (int64, error) {
 
 func (r *UserRepository) FindByName(name string) (*model.User, error) {
 	var user model.User
-	result := r.db.First(&user, name)
+	result := r.db.Where("name = ?", name).First(&user)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			return nil, nil

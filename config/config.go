@@ -12,6 +12,8 @@ type Config struct {
 	DB_USER string
 	DB_PSW  string
 	DB_NAME string
+	RD_HOST string
+	RD_PORT string
 }
 
 func Load() *Config {
@@ -22,6 +24,8 @@ func Load() *Config {
 		DB_USER: getEnv("DB_USER", "root"),
 		DB_PSW:  getEnv("DB_PSW", "Zjk007326"),
 		DB_NAME: getEnv("DB_NAME", "schoolmarket"),
+		RD_HOST: getEnv("RD_HOST", "localhost"),
+		RD_PORT: getEnv("RD_PORT", "6379"),
 	}
 }
 

@@ -1,191 +1,323 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SchoolMarket Users</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, "Microsoft YaHei", sans-serif;
-      background: #f5f7fb;
-      color: #1f2937;
-    }
-    header {
-      padding: 20px 24px;
-      background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    h1 { margin: 0; font-size: 22px; }
-    main {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    section {
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 16px;
-    }
-    h2 {
-      margin: 0 0 12px;
-      font-size: 16px;
-    }
-    label {
-      display: block;
-      margin: 10px 0 6px;
-      font-size: 13px;
-      color: #4b5563;
-    }
-    input {
-      width: 100%;
-      height: 36px;
-      padding: 8px 10px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    button {
-      margin-top: 12px;
-      height: 36px;
-      padding: 0 14px;
-      border: 0;
-      border-radius: 6px;
-      background: #2563eb;
-      color: #ffffff;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    button.secondary { background: #374151; }
-    pre {
-      grid-column: 1 / -1;
-      min-height: 180px;
-      margin: 0;
-      padding: 16px;
-      overflow: auto;
-      background: #111827;
-      color: #d1fae5;
-      border-radius: 8px;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园集市</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .card { background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px; }
+        .card h2 { font-size: 18px; margin-bottom: 16px; color: #1a1a1a; }
+        .form-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; flex: 1; min-width: 120px; }
+        input:focus { border-color: #4f46e5; }
+        .btn { padding: 8px 20px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; transition: all .2s; }
+        .btn-primary { background: #4f46e5; color: #fff; }
+        .btn-primary:hover { background: #4338ca; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: #fff; border: 1px solid #ddd; color: #333; }
+        .btn-outline:hover { background: #f5f5f5; }
+        .btn-sm { padding: 4px 12px; font-size: 12px; }
+        .nav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .nav .user-info { margin-left: auto; font-size: 14px; color: #666; }
+        .nav .user-info span { color: #4f46e5; font-weight: 600; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .list-item:last-child { border-bottom: none; }
+        .list-item .info { flex: 1; }
+        .list-item .info .title { font-size: 15px; font-weight: 500; }
+        .list-item .info .desc { font-size: 12px; color: #999; margin-top: 2px; }
+        .list-item .actions { display: flex; gap: 6px; }
+        .toast { position: fixed; top: 20px; right: 20px; padding: 12px 24px; border-radius: 8px; color: #fff; font-size: 14px; z-index: 999; animation: fadeIn .3s; }
+        .toast.success { background: #22c55e; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+        .empty { text-align: center; padding: 40px 0; color: #999; font-size: 14px; }
+        .tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #e5e7eb; }
+        .tabs .tab { padding: 10px 24px; cursor: pointer; font-size: 14px; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .tabs .tab.active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 600; }
+        @media (max-width: 600px) {
+            .container { padding: 12px; }
+            .nav { flex-direction: column; align-items: stretch; }
+            .nav .user-info { margin-left: 0; text-align: center; }
+            .form-row { flex-direction: column; }
+            .list-item { flex-direction: column; gap: 8px; }
+            .list-item .actions { align-self: flex-end; }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>用户服务测试页</h1>
-  </header>
+    <div class="container" id="app">
+        <div id="login-section">
+            <div class="card" style="max-width:400px;margin:60px auto;">
+                <h2 style="text-align:center;font-size:24px;margin-bottom:24px;">🏫 校园集市</h2>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchLoginTab('login')">登录</div>
+                    <div class="tab" onclick="switchLoginTab('register')">注册</div>
+                </div>
+                <div id="login-form">
+                    <div class="form-row"><input id="login-name" placeholder="用户名"></div>
+                    <div class="form-row"><input id="login-psd" type="password" placeholder="密码" onkeydown="if(event.key==='Enter')doLogin()"></div>
+                    <button class="btn btn-primary" style="width:100%" onclick="doLogin()">登录</button>
+                </div>
+                <div id="register-form" class="hidden">
+                    <div class="form-row"><input id="reg-name" placeholder="用户名"></div>
+                    <div class="form-row"><input id="reg-psd" type="password" placeholder="密码"></div>
+                    <div class="form-row"><input id="reg-psd2" type="password" placeholder="确认密码" onkeydown="if(event.key==='Enter')doRegister()"></div>
+                    <button class="btn btn-primary" style="width:100%" onclick="doRegister()">注册</button>
+                </div>
+            </div>
+        </div>
 
-  <main>
-    <section>
-      <h2>创建用户</h2>
-      <label for="create-name">用户名</label>
-      <input id="create-name" placeholder="name">
-      <label for="create-psw">密码</label>
-      <input id="create-psw" placeholder="psw" type="password">
-      <button onclick="createUser()">创建</button>
-    </section>
+        <div id="main-section" class="hidden">
+            <div class="nav">
+                <button class="btn btn-outline" onclick="showPage('goods')">商品</button>
+                <button class="btn btn-outline" onclick="showPage('cart')">购物车 <span id="cart-badge" style="background:#ef4444;color:#fff;padding:1px 6px;border-radius:10px;font-size:11px;margin-left:4px;">0</span></button>
+                <button class="btn btn-outline" onclick="showPage('mygoods')">我的商品</button>
+                <div class="user-info">👤 <span id="user-name-display"></span></div>
+                <button class="btn btn-danger btn-sm" onclick="doLogout()">退出</button>
+            </div>
 
-    <section>
-      <h2>查询用户</h2>
-      <label for="find-id">用户 ID</label>
-      <input id="find-id" placeholder="1" type="number">
-      <button onclick="getUserById()">按 ID 查询</button>
-      <button class="secondary" onclick="getAllUsers()">查询全部</button>
-    </section>
+            <div id="page-goods" class="page">
+                <div class="card">
+                    <h2>所有商品</h2>
+                    <div id="goods-list"><div class="empty">加载中...</div></div>
+                </div>
+            </div>
 
-    <section>
-      <h2>更新用户</h2>
-      <label for="update-id">用户 ID</label>
-      <input id="update-id" placeholder="1" type="number">
-      <label for="update-name">新用户名</label>
-      <input id="update-name" placeholder="不填则不更新">
-      <label for="update-psw">新密码</label>
-      <input id="update-psw" placeholder="不填则不更新" type="password">
-      <button onclick="updateUser()">更新</button>
-    </section>
+            <div id="page-cart" class="page hidden">
+                <div class="card">
+                    <h2>我的购物车</h2>
+                    <div id="cart-list"><div class="empty">加载中...</div></div>
+                </div>
+            </div>
 
-    <section>
-      <h2>删除用户</h2>
-      <label for="delete-id">用户 ID</label>
-      <input id="delete-id" placeholder="1" type="number">
-      <button onclick="deleteUser()">删除</button>
-    </section>
+            <div id="page-mygoods" class="page hidden">
+                <div class="card">
+                    <h2>我的商品</h2>
+                    <div class="form-row">
+                        <input id="mg-name" placeholder="商品名称">
+                        <input id="mg-num" type="number" placeholder="数量">
+                        <input id="mg-price" type="number" placeholder="价格">
+                        <button class="btn btn-primary" onclick="addMyGoods()">上架</button>
+                    </div>
+                    <div id="mygoods-list"><div class="empty">暂无商品</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <pre id="output">接口返回会显示在这里</pre>
-  </main>
+    <script>
+        const API = '';
+        let token = localStorage.getItem('token') || '';
 
-  <script>
-    const output = document.getElementById("output");
+        function toast(msg, type='info') {
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
 
-    function value(id) {
-      return document.getElementById(id).value.trim();
-    }
+        function switchLoginTab(tab) {
+            document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+            event.target.classList.add('active');
+        }
 
-    function numberValue(id) {
-      const raw = value(id);
-      return raw === "" ? 0 : Number(raw);
-    }
+        async function doRegister() {
+            const name = document.getElementById('reg-name').value.trim();
+            const psd = document.getElementById('reg-psd').value;
+            const psd2 = document.getElementById('reg-psd2').value;
+            if (!name || !psd) return toast('请填写完整', 'error');
+            if (psd !== psd2) return toast('密码不一致', 'error');
+            const res = await fetch(API + '/users/create', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, psw: psd})
+            });
+            const data = await res.json();
+            if (data.code === 200) { toast('注册成功', 'success'); switchLoginTab('login'); }
+            else toast(data.msg || '注册失败', 'error');
+        }
 
-    function show(data) {
-      output.textContent = JSON.stringify(data, null, 2);
-    }
+        async function doLogin() {
+            const name = document.getElementById('login-name').value.trim();
+            const psd = document.getElementById('login-psd').value;
+            if (!name || !psd) return toast('请填写完整', 'error');
+            const res = await fetch(API + '/users/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name, psw: psd})
+            });
+            const data = await res.json();
+            if (data.code === 200) {
+                token = data.data.token;
+                localStorage.setItem('token', token);
+                document.getElementById('user-name-display').textContent = data.data.name;
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('main-section').classList.remove('hidden');
+                toast('登录成功', 'success');
+                loadGoods(); loadCart();
+            } else toast(data.msg || '登录失败', 'error');
+        }
 
-    async function request(path, options = {}) {
-      try {
-        const res = await fetch(path, {
-          headers: { "Content-Type": "application/json" },
-          ...options,
-        });
-        const data = await res.json();
-        show({ httpStatus: res.status, body: data });
-      } catch (err) {
-        show({ error: err.message });
-      }
-    }
+        function doLogout() {
+            token = '';
+            localStorage.removeItem('token');
+            document.getElementById('main-section').classList.add('hidden');
+            document.getElementById('login-section').classList.remove('hidden');
+        }
 
-    function createUser() {
-      request("/users/create", {
-        method: "POST",
-        body: JSON.stringify({
-          name: value("create-name"),
-          psw: value("create-psw"),
-        }),
-      });
-    }
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('page-' + page).classList.remove('hidden');
+            if (page === 'goods') loadGoods();
+            if (page === 'cart') loadCart();
+            if (page === 'mygoods') loadMyGoods();
+        }
 
-    function getUserById() {
-      request(`/users/find/aim?id=${encodeURIComponent(numberValue("find-id"))}`);
-    }
+        async function api(path, opts={}) {
+            const h = {'Content-Type': 'application/json'};
+            if (token) h['Authorization'] = 'Bearer ' + token;
+            Object.assign(h, opts.headers || {});
+            const res = await fetch(API + path, { ...opts, headers: h });
+            return res.json();
+        }
 
-    function getAllUsers() {
-      request("/users/find/all");
-    }
+        async function loadGoods() {
+            const el = document.getElementById('goods-list');
+            const data = await api('/goods/find/all');
+            if (data.code !== 200 || !data.data || !data.data.length)
+                return el.innerHTML = '<div class="empty">暂无商品</div>';
+            el.innerHTML = data.data.map(g => `
+                <div class="list-item">
+                    <div class="info">
+                        <div class="title">${g.name}</div>
+                        <div class="desc">¥${g.price} | 库存${g.num} | 卖家ID:${g.user_id}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-primary btn-sm" onclick="addToCart(${g.id})">加入购物车</button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-    function updateUser() {
-      const body = { id: numberValue("update-id") };
-      const newName = value("update-name");
-      const newPsw = value("update-psw");
-      if (newName !== "") body.newname = newName;
-      if (newPsw !== "") body.newpsw = newPsw;
+        async function loadCart() {
+            const data = await api('/cart/get');
+            const el = document.getElementById('cart-list');
+            if (data.code !== 200 || !data.data || !data.data.length) {
+                el.innerHTML = '<div class="empty">购物车是空的</div>';
+                document.getElementById('cart-badge').textContent = '0';
+                return;
+            }
+            document.getElementById('cart-badge').textContent = data.data.length;
+            el.innerHTML = data.data.map(c => `
+                <div class="list-item">
+                    <div class="info">
+                        <div class="title">${c.goods_name || '商品#'+c.goods_id}</div>
+                        <div class="desc">数量:${c.num} | ¥${c.goods_price || '?'}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-outline btn-sm" onclick="editCart(${c.id})">修改</button>
+                        <button class="btn btn-danger btn-sm" onclick="delCart(${c.id})">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-      request("/users/update", {
-        method: "PUT",
-        body: JSON.stringify(body),
-      });
-    }
+        async function addToCart(goodsId) {
+            const data = await api('/cart/add', {
+                method: 'POST',
+                body: JSON.stringify({goods_id: goodsId, num: 1})
+            });
+            if (data.code === 200) { toast('已加入购物车', 'success'); loadCart(); }
+            else toast(data.msg || '添加失败', 'error');
+        }
 
-    function deleteUser() {
-      request("/users/delete", {
-        method: "DELETE",
-        body: JSON.stringify({ id: numberValue("delete-id") }),
-      });
-    }
-  </script>
+        async function editCart(id) {
+            const num = prompt('新数量:');
+            if (!num || isNaN(num)) return;
+            const data = await api('/cart/update', {
+                method: 'PUT',
+                body: JSON.stringify({id, num: parseInt(num)})
+            });
+            if (data.code === 200) { toast('已更新', 'success'); loadCart(); }
+            else toast(data.msg, 'error');
+        }
+
+        async function delCart(id) {
+            if (!confirm('确定删除？')) return;
+            const data = await api('/cart/delete', {
+                method: 'DELETE',
+                body: JSON.stringify({id})
+            });
+            if (data.code === 200) { toast('已删除', 'success'); loadCart(); }
+            else toast(data.msg, 'error');
+        }
+
+        async function loadMyGoods() {
+            const data = await api('/goods/find/all');
+            const el = document.getElementById('mygoods-list');
+            if (data.code !== 200 || !data.data || !data.data.length)
+                return el.innerHTML = '<div class="empty">暂无商品</div>';
+            el.innerHTML = data.data.map(g => `
+                <div class="list-item">
+                    <div class="info">
+                        <div class="title">${g.name}</div>
+                        <div class="desc">¥${g.price} | 库存${g.num}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-danger btn-sm" onclick="delGoods(${g.id})">下架</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function addMyGoods() {
+            const name = document.getElementById('mg-name').value.trim();
+            const num = parseInt(document.getElementById('mg-num').value);
+            const price = parseInt(document.getElementById('mg-price').value);
+            if (!name || !num || !price) return toast('请填写完整', 'error');
+            const data = await api('/goods/create', {
+                method: 'POST',
+                body: JSON.stringify({name, num, price})
+            });
+            if (data.code === 200) {
+                toast('上架成功', 'success');
+                document.getElementById('mg-name').value = '';
+                document.getElementById('mg-num').value = '';
+                document.getElementById('mg-price').value = '';
+                loadMyGoods();
+            } else toast(data.msg || '上架失败', 'error');
+        }
+
+        async function delGoods(id) {
+            if (!confirm('确定下架？')) return;
+            const data = await api('/goods/delete', {
+                method: 'DELETE',
+                body: JSON.stringify({id})
+            });
+            if (data.code === 200) { toast('已下架', 'success'); loadMyGoods(); }
+            else toast(data.msg, 'error');
+        }
+
+        // 恢复登录状态
+        (async function() {
+            if (!token) return;
+            const data = await api('/goods/find/all');
+            if (data.code === 200) {
+                document.getElementById('user-name-display').textContent = '已登录';
+                document.getElementById('login-section').classList.add('hidden');
+                document.getElementById('main-section').classList.remove('hidden');
+                loadGoods(); loadCart();
+            } else { localStorage.removeItem('token'); token = ''; }
+        })();
+    </script>
 </body>
 </html>
